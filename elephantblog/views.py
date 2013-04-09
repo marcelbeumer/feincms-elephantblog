@@ -2,6 +2,9 @@ import datetime
 
 from django.conf import settings
 from django.http import Http404, HttpResponse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -65,7 +68,9 @@ class ElephantblogMixin(object):
 
     def render_to_response(self, context, **response_kwargs):
         if 'app_config' in getattr(self.request, '_feincms_extra_context', {}):
-            return self.get_template_names(), context
+            names = self.get_template_names()
+            content_names = [('content/' + name) for name in names]
+            return render_to_response(content_names, context, RequestContext(self.request))
 
         return super(ElephantblogMixin, self).render_to_response(
             context, **response_kwargs)
